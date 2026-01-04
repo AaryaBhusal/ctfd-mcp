@@ -31,15 +31,16 @@ CTFD_PASSWORD=your_password
 
 ## Install
 
-```bash
-git clone https://github.com/umbra2728/ctfd-mcp.git
-uv sync
-```
+- From PyPI (recommended): `uvx ctfd-mcp --help`
+- From source checkout (no install): `uvx --from . ctfd-mcp --help`
 
 ## Run MCP server (stdio)
 
 ```bash
-uv run python -m main
+# installed from PyPI
+uvx ctfd-mcp
+# from local checkout
+uvx --from . ctfd-mcp
 ```
 
 ## Cursor and Claude MCP config example
@@ -48,15 +49,8 @@ uv run python -m main
 {
   "mcpServers": {
     "ctfd-mcp": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/absolute/path/to/ctfd-mcp",
-        "run",
-        "python",
-        "-m",
-        "main"
-      ],
+      "command": "uvx",
+      "args": ["ctfd-mcp"],
       "env": {
         "CTFD_URL": "https://ctfd.example.com",
         "CTFD_TOKEN": "your_user_token"
@@ -70,15 +64,8 @@ uv run python -m main
 
 ```toml
 [mcp_servers.ctfd-mcp]
-command = "uv"
-args = [
-  "--directory",
-  "/absolute/path/to/ctfd-mcp",
-  "run",
-  "python",
-  "-m",
-  "main"
-]
+command = "uvx"
+args = ["ctfd-mcp"]
 
 [mcp_servers.ctfd-mcp.env]
 CTFD_URL = "https://ctfd.example.com"
@@ -115,6 +102,13 @@ Attachments are returned as absolute URLs in `files`; the client/host can fetch 
 - If the server redirects you to `/login` (302) when using a token, switch to a browser session cookie: set `CTFD_SESSION` from the `session` cookie after logging in.
 - The client now supports logging in with `CTFD_USERNAME` and `CTFD_PASSWORD`; these fields take precedence over stale tokens/sessions.
 - Auth priority: username/password first, then token, then session cookie. Lower-priority credentials are ignored when a higher-priority option is present.
+
+## Support / feedback
+
+If something breaks or you have questions, reach out:
+- Telegram: @ismailgaleev
+- Jabber: ismailgaleev@chat.merlok.ru
+- Email: umbra2728@gmail.com
 
 ## Testing
 

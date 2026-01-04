@@ -1,8 +1,20 @@
+"""Config loading tests (ruff: ignore E402 for sys.path adjustment)."""
+
+# ruff: noqa: E402
+
 import os
+import sys
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
-from config import load_config
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+for path in (SRC, ROOT):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
+
+from ctfd_mcp.config import load_config
 
 
 def _load_with_env(env: dict[str, str]):

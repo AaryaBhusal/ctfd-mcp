@@ -6,8 +6,8 @@ from typing import Any
 import anyio
 from mcp.server.fastmcp import FastMCP
 
-from config import ConfigError, load_config
-from ctfd_client import (
+from .config import ConfigError, load_config
+from .ctfd_client import (
     AuthError,
     CTFdClient,
     CTFdClientError,

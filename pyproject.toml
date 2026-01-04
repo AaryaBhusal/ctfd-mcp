@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "ctfd-mcp"
 version = "0.1.0"
@@ -6,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 license = { file = "LICENSE" }
 dependencies = [
+    "anyio>=4.4",
     "httpx>=0.28.1",
     "mcp>=1.23.3",
     "python-dotenv>=1.2.1",
@@ -15,6 +20,9 @@ dependencies = [
 Homepage = "https://github.com/umbra2728/ctfd-mcp"
 Repository = "https://github.com/umbra2728/ctfd-mcp"
 Issues = "https://github.com/umbra2728/ctfd-mcp/issues"
+
+[project.scripts]
+ctfd-mcp = "ctfd_mcp.main:main"
 
 [dependency-groups]
 dev = [

@@ -1,3 +1,7 @@
+"""CTFd client tests (ruff: ignore E402 for sys.path adjustment)."""
+
+# ruff: noqa: E402
+
 import asyncio
 import json
 import os
@@ -9,19 +13,17 @@ from pathlib import Path
 import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+SRC = ROOT / "src"
+for path in (SRC, ROOT):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
 # Avoid optional dependency issues in the test runner (python-dotenv).
 if "dotenv" not in sys.modules:
     sys.modules["dotenv"] = types.SimpleNamespace(load_dotenv=lambda *_, **__: None)
 
-from config import Config  # type: ignore  # noqa: E402  # added to path above
-from ctfd_client import (  # type: ignore  # noqa: E402
-    AuthError,
-    CTFdClient,
-    CTFdClientError,
-)
+from ctfd_mcp.config import Config  # type: ignore
+from ctfd_mcp.ctfd_client import AuthError, CTFdClient, CTFdClientError  # type: ignore
 
 CTFD_URL = os.getenv("CTFD_URL")
 CTFD_USERNAME = os.getenv("CTFD_USERNAME")

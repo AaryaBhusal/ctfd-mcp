@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 
-from config import Config
+from .config import Config
 
 
 class CTFdClientError(Exception):
