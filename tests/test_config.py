@@ -19,7 +19,7 @@ from ctfd_mcp.config import load_config
 
 def _load_with_env(env: dict[str, str]):
     """Load config with isolated env and no .env side effects."""
-    with patch("config.load_dotenv", return_value=None):
+    with patch("ctfd_mcp.config.load_dotenv", return_value=None):
         with patch.dict(os.environ, env, clear=True):
             return load_config()
 
