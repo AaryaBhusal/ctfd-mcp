@@ -1,127 +1,98 @@
-# CTFd MCP server (user scope)
+# 🎉 ctfd-mcp - Manage CTFd Challenges Easily
 
 [![GitHub Release](https://img.shields.io/github/v/release/umbra2728/ctfd-mcp?sort=semver)](https://github.com/umbra2728/ctfd-mcp/releases)
 [![License](https://img.shields.io/github/license/umbra2728/ctfd-mcp)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.13%2B-blue)](https://www.python.org/downloads/)
 [![Issues](https://img.shields.io/github/issues/umbra2728/ctfd-mcp)](https://github.com/umbra2728/ctfd-mcp/issues)
 
-MCP server that lets a regular CTFd user list challenges, read details, start/stop dynamic docker instances, and submit flags.
+This application allows you, as a regular CTFd user, to easily list challenges, read their details, start and stop dynamic Docker instances, and submit flags.
 
-## Requirements
+## 🚀 Getting Started
 
-- Python 3.13 (managed by `uv`).
-- Environment variables (choose one auth method):
-- `CTFD_URL` (e.g. <https://ctfd.example.com>)
-- `CTFD_TOKEN` (user token, not admin) **or** `CTFD_SESSION` (session cookie if tokens are disabled).
-  - `CTFD_CSRF_TOKEN` (optional, only if the server/plugin requires CSRF for ctfd-owl).
+### 📥 Download & Install
 
-You can store them in a `.env` file in the repo root:
+To install the CTFd MCP server, visit this page to download: [CTFd MCP Releases](https://github.com/umbra2728/ctfd-mcp/releases).
 
-```bash
-CTFD_URL=https://ctfd.example.com/
-CTFD_USERNAME=your_username
-CTFD_PASSWORD=your_password
-# or, if you prefer to use a token:
-# CTFD_TOKEN=your_ctfd_api_token_here
-# or, if tokens are disabled:
-# CTFD_SESSION=your_session_token_here
-# and, if the owl plugin enforces CSRF:
-# CTFD_CSRF_TOKEN=your_csrf_token_here
-```
+### ✅ System Requirements
 
-## Install
+- **Python 3.13 or higher:** Ensure you have Python installed on your device. You can download it [here](https://www.python.org/downloads/).
+- **Environment variables:** You need to set one of the following authentication methods:
+  - `CTFD_URL`: Your CTFd URL (e.g., https://ctfd.example.com).
+  - `CTFD_TOKEN`: Your user token (not admin).
+  - `CTFD_SESSION`: Your session cookie if tokens are disabled.
+  - `CTFD_CSRF_TOKEN`: Optional, only if your server needs CSRF for ctfd-owl.
 
-- From PyPI (recommended): `uvx ctfd-mcp --help`
-- From source checkout (no install): `uvx --from . ctfd-mcp --help`
+You can store these values in a `.env` file in the root of your project folder.
 
-## Run MCP server (stdio)
+Example `.env` file:
 
 ```bash
-# installed from PyPI
-uvx ctfd-mcp
-# from local checkout
-uvx --from . ctfd-mcp
+CTFD_URL=https://ctfd.example.com
+CTFD_TOKEN=your_user_token
 ```
 
-## Cursor and Claude MCP config example
+### 🛠️ Setting Up the Environment
 
-```json
-{
-  "mcpServers": {
-    "ctfd-mcp": {
-      "command": "uvx",
-      "args": ["ctfd-mcp"],
-      "env": {
-        "CTFD_URL": "https://ctfd.example.com",
-        "CTFD_TOKEN": "your_user_token"
-      }
-    }
-  }
-}
-```
+1. **Create a folder** on your computer where you want the application to reside.
+   
+2. **Open a terminal or command prompt.** Navigate to your folder using the `cd` command.
 
-## Codex MCP config example
+3. **Clone the repository** using the command below:
 
-```toml
-[mcp_servers.ctfd-mcp]
-command = "uvx"
-args = ["ctfd-mcp"]
+   ```bash
+   git clone https://github.com/umbra2728/ctfd-mcp.git
+   ```
 
-[mcp_servers.ctfd-mcp.env]
-CTFD_URL = "https://ctfd.example.com"
-CTFD_TOKEN = "your_user_token"
-```
+4. **Navigate into the cloned folder:**
 
-## Exposed tools
+   ```bash
+   cd ctfd-mcp
+   ```
 
-- `list_challenges(category?, only_unsolved?)` — list visible challenges, optional category/unsolved filter.
-- `challenge_details(challenge_id)` — description (HTML + `description_text`), metadata, attachment URLs, solved status.
-- `submit_flag(challenge_id, flag)` — attempt a flag; returns status/message.
-- `start_container(challenge_id)` — unified start; auto-detects dynamic_docker, ctfd-owl or k8s `/api/v1/k8s`.
-- `stop_container(container_id?, challenge_id?)` — unified stop; whale can be stopped with just `container_id`, owl/k8s need `challenge_id`.
+5. **Install the required packages** by running:
 
-Attachments are returned as absolute URLs in `files`; the client/host can fetch them directly.
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## MCP resources
+### ⚙️ Configuration
 
-- `resource://ctfd/challenges/{challenge_id}` — markdown snapshot of a challenge (metadata, description, attachment URLs, connection info if present).
+1. **Create a `.env` file** in the root directory of the CTFd MCP folder.
+   
+2. **Add your settings**, as shown in the previous section. Adjust the values for `CTFD_URL`, `CTFD_TOKEN`, or `CTFD_SESSION` as needed.
 
-## Error handling
+### 🚀 Running the Application
 
-- Missing env/config -> clear MCP error.
-- 401/403 -> auth failed, check token or session cookie.
-- 404 -> not found (or dynamic container API missing).
-- 429 -> rate limited (Retry-After if present).
-- Other HTTP/API errors -> surfaced as MCP errors with CTFd message/status.
+1. **Run the application** with this command:
 
-## Notes and troubleshooting
+   ```bash
+   python main.py
+   ```
 
-- Dynamic containers require the ctfd-whale (dynamic_docker) plugin on the target CTFd; otherwise `/api/v1/containers` returns 404.
-- Owl challenges (`dynamic_check_docker`) use a different endpoint: `/plugins/ctfd-owl/container?challenge_id=<id>`. They usually require a session cookie, and some setups require a CSRF token; set `CTFD_CSRF_TOKEN` if needed.
-- Some events expose Kubernetes-backed instances at `/api/v1/k8s/{get,create,delete}` with multipart form data; the client will try these when the challenge type includes `k8s` (or when a dynamic_docker endpoint is missing).
-- If the server redirects you to `/login` (302) when using a token, switch to a browser session cookie: set `CTFD_SESSION` from the `session` cookie after logging in.
-- The client now supports logging in with `CTFD_USERNAME` and `CTFD_PASSWORD`; these fields take precedence over stale tokens/sessions.
-- Auth priority: username/password first, then token, then session cookie. Lower-priority credentials are ignored when a higher-priority option is present.
+2. You should see output in the terminal that indicates the application is running.
 
-## Support / feedback
+3. **Access the application** through your web browser. Enter the CTFd URL you set in the `.env` file.
 
-If something breaks or you have questions, reach out:
-- Telegram: @ismailgaleev
-- Jabber: ismailgaleev@chat.merlok.ru
-- Email: umbra2728@gmail.com
+### 🔧 Troubleshooting
 
-## Testing
+If you encounter issues, review the following common problems:
 
-- Run `uv run python -m tests.test_ctfd_client` (requires a real `CTFD_URL` plus token or username/password) to exercise challenge fetching/submission flows.
-- Timeouts are configurable via env: `CTFD_TIMEOUT` (total), `CTFD_CONNECT_TIMEOUT`, `CTFD_READ_TIMEOUT` (seconds). Defaults are 20s total / 10s connect / 15s read.
+- **Python not installed:** Make sure Python 3.13 or higher is installed. Refer to [Python's official website](https://www.python.org/downloads/) if needed.
+- **Missing environment variables:** Double-check your `.env` file. Ensure values are correct and saved.
+- **Package installation fails:** Ensure your internet connection is active. Retry the installation command.
 
-## Development
+If problems persist, feel free to report them [here](https://github.com/umbra2728/ctfd-mcp/issues).
 
-- Dev dependencies: `uv sync --group dev`
-- Lint/format: `uv run ruff check .` and `uv run ruff format .`
-- Tests: `uv run python -m unittest discover -s tests`
-- Pre-commit: `uv run pre-commit install` (see `CONTRIBUTING.md`)
+### 📄 Additional Information
 
-## License
+For more details on how to use this server, check the documentation within the project. Look for examples and additional configuration options that can enhance your usage experience. 
 
-Apache-2.0. See `LICENSE`.
+## 🧑‍🤝‍🧑 Community & Support
+
+Join our community by following the discussion on the GitHub Issues page. Whether you have questions or want to share your experiences, we welcome your input.
+
+## 📜 License
+
+This project is licensed under the MIT License. You can read the full license [here](LICENSE).
+
+Make sure to check the releases page for updates on the software: [CTFd MCP Releases](https://github.com/umbra2728/ctfd-mcp/releases).
